@@ -90,7 +90,7 @@ def run():
     query_results = p | 'Read from BigQuery' >> beam.io.Read(bq_source)
     query_results | 'Write log 1' >> WriteToText('input.txt')
     
-    # apply ParDo to format the date of movie  
+    # format state
     formatted_state_pcoll = query_results | 'Format State' >> beam.ParDo(FormatStateFn())
 
     # write PCollection to log file
