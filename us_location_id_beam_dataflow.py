@@ -71,7 +71,6 @@ class FormatStateFn(beam.DoFn):
         # print(cusa_record)
         element_id = cusa_record.get('id')
         province_state = cusa_record.get('province_state')
-        country_region = cusa_record.get('country_region')
                 
         city_county = None
         state = None
@@ -83,8 +82,8 @@ class FormatStateFn(beam.DoFn):
                 province_state = states_abv.get(state)
                 print('city_county', city_county)
                 print('state', state)
-                return [{'id':element_id, 'city_county':city_county, 'province_state':province_state, 'country_region':country_region}]
-        return [{'id':element_id, 'city_county':city_county, 'province_state':province_state, 'country_region':country_region}]
+                return [{'id':element_id, 'city_county':city_county, 'province_state':province_state}]
+        return [{'id':element_id, 'city_county':city_county, 'province_state':province_state}]
         
 def run():         
     PROJECT_ID = 'spry-cosine-266801' 
@@ -106,7 +105,7 @@ def run():
     # Create the Pipeline with the specified options.
     p = Pipeline(options=options)
 
-    sql = 'SELECT id, province_state, country_region FROM covid19_jhu_csse_modeled.us_location_id'
+    sql = 'SELECT id, province_state FROM covid19_jhu_csse_modeled.us_location_id'
     bq_source = beam.io.BigQuerySource(query=sql, use_standard_sql=True)
 
     query_results = p | 'Read from BigQuery' >> beam.io.Read(bq_source)
@@ -120,7 +119,7 @@ def run():
     
     dataset_id = 'covid19_jhu_csse_modeled'
     table_id = 'us_location_id_Beam_DF'
-    schema_id = 'id:INTEGER, city_county:STRING, province_state:STRING, country_region:STRING'
+    schema_id = 'id:INTEGER, city_county:STRING, province_state:STRING'
 
     # write PCollection to new BQ table
     formatted_state_pcoll | 'Write BQ table' >> beam.io.WriteToBigQuery(dataset=dataset_id, 
